@@ -1,25 +1,33 @@
 <?php
 header('Content-Type: application/json');
 session_start();
-require_once __DIR__ . '/../config/db.php';
 
-$data = json_decode(file_get_contents("php://input"));
+// db.php is in config/ which is one level up from public/
+require_once '../config/db.php';
 
-if ($data && isset($data->email) && isset($data->password)) {
-    $email = $data->email;
-    $pass = $data->password;
+$data = json_decode(file_get_contents("php://input"), true);
 
-    $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ? AND password = ?");
-    $stmt->execute([$email, $pass]);
-    $user = $stmt->fetch();
+$email    = trim($data['email'] ?? '');
+$password = $data['password'] ?? '';
 
-    if ($user) {
+if (empty($email) || empty($password)) {
+    echo json_encode(["status" => "error", "message" => "Please enter both email and password"]);
+    exit;
+}
+
+try {
+    $stmt = $pdo->prepare("SELECT * FROM admins WHERE email = ?");
+    $stmt->execute([$email]);
+    $user = $stmt->fetch(PDO::FETCH_ASSOC);
+
+    if ($user && $password === $user['password']) {
         $_SESSION['admin'] = $user['email'];
         echo json_encode(["status" => "success"]);
     } else {
-        echo json_encode(["status" => "error", "message" => "Invalid email or password."]);
+        echo json_encode(["status" => "error", "message" => "Invalid email or password"]);
     }
-} else {
-    echo json_encode(["status" => "error", "message" => "Invalid Request"]);
+
+} catch (PDOException $e) {
+    echo json_encode(["status" => "error", "message" => "Database error: " . $e->getMessage()]);
 }
 ?>
