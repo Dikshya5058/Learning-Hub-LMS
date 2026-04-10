@@ -249,7 +249,7 @@ footer {
             <button class="btn btn-primary">Continue as User</button>
         </div>
 
-        <div class="mode-card" onclick="window.location.href='admin_login.php'">
+        <div class="mode-card" onclick="window.location.href='index.html'">
             <h3>🛠 Admin Mode</h3>
             <p>Manage books, users, and system operations.</p>
             <button class="btn btn-outline">Continue as Admin</button>
