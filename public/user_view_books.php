@@ -3,22 +3,21 @@ session_start();
 require '../config/db.php';
 
 if (!isset($_SESSION['user_id'])) {
-    header("Location: ../public/user_login.php");
+    header("Location: user_login.php");
     exit();
 }
 
 $user_id = $_SESSION['user_id'];
 
-// Fetch all books
-$books_result = $conn->query("SELECT * FROM books ORDER BY created_at DESC");
+// Fetch books
+$stmt = $pdo->query("SELECT * FROM books ORDER BY created_at DESC");
+$books = $stmt->fetchAll();
 
-// Fetch ALL borrowed books to check who borrowed what
-$borrowed_query = $conn->query("SELECT book_id, user_id FROM borrowed_books WHERE returned_at IS NULL");
+// Borrowed data
+$stmt = $pdo->query("SELECT book_id, user_id FROM borrowed_books WHERE returned_at IS NULL");
 $borrowed_data = [];
-if($borrowed_query){
-    while($row = $borrowed_query->fetch_assoc()){
-        $borrowed_data[$row['book_id']] = $row['user_id'];
-    }
+foreach ($stmt as $row) {
+    $borrowed_data[$row['book_id']] = $row['user_id'];
 }
 ?>
 
@@ -152,11 +151,11 @@ header h1 { font-size: 22px; font-weight: 800; color: var(--brand-teal); }
     </div>
 
     <div class="books-grid">
-        <?php while($book = $books_result->fetch_assoc()): 
-            $book_id = $book['id'];
-            $is_borrowed = isset($borrowed_data[$book_id]);
-            $borrowed_by_me = ($is_borrowed && $borrowed_data[$book_id] == $user_id);
-        ?>
+        <?php foreach($books as $book): 
+    $book_id = $book['id'];
+    $is_borrowed = isset($borrowed_data[$book_id]);
+    $borrowed_by_me = ($is_borrowed && $borrowed_data[$book_id] == $user_id);
+?>
         <div class="book-card">
             <div class="book-content">
                 <span class="category-tag"><?php echo htmlspecialchars($book['category']); ?></span>
@@ -187,7 +186,7 @@ onsubmit="return confirm('Are you sure you want to borrow this book?\n\nYou must
                 <?php endif; ?>
             </div>
         </div>
-        <?php endwhile; ?>
+        <?php endforeach; ?>
     </div>
 
     <a href="user_dashboard.php" class="back-link">← Back to Dashboard</a>
