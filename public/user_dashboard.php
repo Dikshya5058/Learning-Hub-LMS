@@ -10,22 +10,19 @@ if (!isset($_SESSION['user_id'])) {
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
 
-// --- Greeting Logic ---
 $greeting_prefix = "Welcome back,";
 if (!isset($_SESSION['returning_user'])) {
     $greeting_prefix = "Great to have you,";
     $_SESSION['returning_user'] = true;
 }
 
-// Fetch books (limited to 6 for dashboard)
-$books_result = $conn->query("SELECT * FROM books LIMIT 6");
+// Fetch books
+$stmt = $pdo->query("SELECT * FROM books LIMIT 6");
+$books = $stmt->fetchAll();
 
-// Fetch ALL borrowed books to check status
-$borrowed_result = $conn->query("SELECT book_id FROM borrowed_books WHERE returned_at IS NULL");
-$borrowed_books = [];
-while($row = $borrowed_result->fetch_assoc()){
-    $borrowed_books[] = $row['book_id']; 
-}
+// Fetch borrowed books
+$stmt = $pdo->query("SELECT book_id FROM borrowed_books WHERE returned_at IS NULL");
+$borrowed_books = $stmt->fetchAll(PDO::FETCH_COLUMN);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -70,7 +67,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
 .sidebar-footer { padding: 20px 30px; }
 .logout-link { display: flex; align-items: center; color: #f43f5e; text-decoration: none; font-weight: 700; font-size: 14px; gap: 10px; }
 
-/* Main Content */
+
 .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 60px; }
 
 .top-nav { display: flex; justify-content: flex-end; align-items: center; padding: 40px 0 20px 0; }
@@ -85,7 +82,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
 .hero-section h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; margin-bottom: 8px; }
 .hero-section p { color: var(--text-muted); font-size: 15px; max-width: 500px; line-height: 1.6; }
 
-/* --- BOOK GRID --- */
 .book-shelf { 
     display: grid; 
     grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
@@ -148,7 +144,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
     display: block;
 }
 
-/* Badges */
+
 .category-badge { 
     padding: 4px 10px; 
     border-radius: 6px; 
@@ -165,10 +161,26 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
     font-size: 9px; 
     font-weight: 800; 
     text-transform: uppercase; 
+    display: inline-block;
 }
-.bg-avail { background: #ecfdf5; color: #10b981; }
-.bg-brwd { background: #fff1f2; color: #f43f5e; }
 
+
+.bg-avail { 
+    background: transparent !important;
+    color: #10b981 !important;
+}
+
+
+.bg-avail::before {
+    content: "● ";
+    color: #10b981;
+}
+
+/
+.bg-brwd { 
+    background: #fff1f2;
+    color: #f43f5e;
+}
 .desc-toggle { 
     cursor: pointer; 
     font-size: 12px; 
@@ -263,21 +275,21 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
         </header>
 
         <section class="book-shelf">
-            <?php while($book = $books_result->fetch_assoc()): 
+            <?php foreach($books as $book): 
                 $is_borrowed = in_array($book['id'], $borrowed_books);
             ?>
             <div class="book-card">
                 <div class="card-header">
                     <div class="badge-container">
                         <span class="category-badge"><?php echo htmlspecialchars($book['category']); ?></span>
-                        
-                        <span class="status-badge <?php echo $is_borrowed ? 'bg-brwd' : 'bg-avail'; ?>">
+
+                        <span class="status-badge <?php echo $is_borrowed ? 'bg-brwd' : ''; ?>">
                             <?php echo $is_borrowed ? 'Borrowed' : 'Available'; ?>
                         </span>
                     </div>
                     <span style="font-size: 16px; opacity: 0.3;">🔖</span>
                 </div>
-                
+
                 <h3><?php echo htmlspecialchars($book['title']); ?></h3>
                 <span class="author-tag">by <?php echo htmlspecialchars($book['author']); ?></span>
 
@@ -286,7 +298,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
                     <?php echo nl2br(htmlspecialchars($book['description'])); ?>
                 </div>
             </div>
-            <?php endwhile; ?>
+            <?php endforeach; ?>
         </section>
 
         <div class="shelf-action">
@@ -303,6 +315,7 @@ function toggleDescription(button) {
     button.textContent = desc.classList.contains('show-desc') ? 'Hide Details' : 'Quick Details';
 }
 </script>
-
 </body>
 </html>
+
+
