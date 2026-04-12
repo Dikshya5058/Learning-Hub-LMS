@@ -1,12 +1,19 @@
 <?php
 $host = "localhost";
-$user = "root";       // your DB username
-$password = "";       // your DB password
 $dbname = "Learning_Management_System";
+$user = "root";
+$password = "";
 
-$conn = new mysqli($host, $user, $password, $dbname);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $user, $password);
 
-if ($conn->connect_error) {
-    die("Connection failed: " . $conn->connect_error);
+    // Error mode
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+
+    // Default fetch mode
+    $pdo->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE, PDO::FETCH_ASSOC);
+
+} catch (PDOException $e) {
+    die("Connection failed: " . $e->getMessage());
 }
 ?>

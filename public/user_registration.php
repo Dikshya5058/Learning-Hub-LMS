@@ -1,44 +1,40 @@
 <?php
 require '../config/db.php';
 
-// Initialize error variables
 $email_error = $password_error = $confirm_error = "";
 
 if ($_SERVER["REQUEST_METHOD"] == "POST") {
-    $name = $conn->real_escape_string($_POST['name']);
-    $email = $conn->real_escape_string($_POST['email']);
+    $name = $_POST['name'];
+    $email = $_POST['email'];
     $password = $_POST['password'];
     $confirm_password = $_POST['confirm_password'];
 
-    // Password regex: min 8 chars, uppercase, lowercase, number, special char
     $pattern = "/^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}$/";
 
-    // Check email uniqueness
-    $check = $conn->query("SELECT * FROM users WHERE email='$email'");
-    if ($check->num_rows > 0) {
-        $email_error = "Email already exists. Please use a different email.";
+    // Check email
+    $stmt = $pdo->prepare("SELECT * FROM users WHERE email=?");
+    $stmt->execute([$email]);
+
+    if ($stmt->rowCount() > 0) {
+        $email_error = "Email already exists.";
     }
 
-    // Check password strength
     if (!preg_match($pattern, $password)) {
-        $password_error = "Must be at least 8 characters, include uppercase, lowercase, number, and special character.";
+        $password_error = "Weak password.";
     }
 
-    // Check password match
     if ($password !== $confirm_password) {
         $confirm_error = "Passwords do not match.";
     }
 
-    // If no errors, insert user
     if (empty($email_error) && empty($password_error) && empty($confirm_error)) {
-        $hashed_password = password_hash($password, PASSWORD_DEFAULT);
-        $insert = $conn->query("INSERT INTO users (name, email, password) VALUES ('$name', '$email', '$hashed_password')");
-        if ($insert) {
-            header("Location: user_login.php");
-            exit();
-        } else {
-            echo "Error: " . $conn->error;
-        }
+        $hashed = password_hash($password, PASSWORD_DEFAULT);
+
+        $stmt = $pdo->prepare("INSERT INTO users (name,email,password) VALUES (?,?,?)");
+        $stmt->execute([$name, $email, $hashed]);
+
+        header("Location: user_login.php");
+        exit();
     }
 }
 ?>
