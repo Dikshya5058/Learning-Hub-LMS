@@ -52,7 +52,9 @@ if (isset($_POST['add_book'])) {
                      VALUES (?, ?, ?, ?, ?)"
                 );
                 $stmt->execute([$title, $author, $category, $content, $pdf_file]);
-                $success = "Book added successfully!";
+$_SESSION['success_msg'] = "Book added successfully!";
+header("Location: dashboard.php");
+exit();
             } catch (PDOException $e) {
                 $error = "Database error: " . $e->getMessage();
             }
