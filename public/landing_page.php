@@ -75,7 +75,6 @@ body {
 }
 
 .btn-primary:hover {
-    background: var(--primary-dark);
     transform: translateY(-2px);
 }
 
@@ -223,7 +222,7 @@ footer {
 
 <!-- NAVBAR -->
 <nav class="navbar">
-    <div class="logo">Learning Hub</div>
+    <div class="logo">📚 Learning Hub</div>
     <div class="nav-auth">
         <a href="user_login.php" class="btn btn-outline">Log In</a>
         <a href="user_registration.php" class="btn btn-primary">Sign Up</a>
@@ -262,22 +261,25 @@ footer {
     <h2>What You Can Do</h2>
 
     <div class="grid">
+
         <div class="card">
             <div class="icon">📚</div>
             <h3>Browse Books</h3>
             <p>Explore available books in different categories.</p>
         </div>
 
+        
         <div class="card">
-            <div class="icon">⚡</div>
-            <h3>Borrow Instantly</h3>
-            <p>Borrow books easily with automatic due dates.</p>
+            <div class="icon">👁️</div>
+            <h3>Preview Books</h3>
+            <p>Explore book summaries before signing up.</p>
         </div>
 
+        
         <div class="card">
-            <div class="icon">📅</div>
-            <h3>Track Books</h3>
-            <p>Monitor borrowed books and return dates.</p>
+            <div class="icon">🔍</div>
+            <h3>Discover Library</h3>
+            <p>Find curated books and recommendations easily.</p>
         </div>
 
         <div class="card">
@@ -285,6 +287,7 @@ footer {
             <h3>Read Online</h3>
             <p>Access reading features anytime.</p>
         </div>
+
     </div>
 </section>
 
