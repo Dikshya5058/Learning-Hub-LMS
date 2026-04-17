@@ -175,10 +175,10 @@ header h1 { font-size: 22px; font-weight: 800; color: var(--brand-teal); }
 
                 <?php if(!$is_borrowed): ?>
                     <form action="user_borrow.php" method="POST" 
-onsubmit="return confirm('Are you sure you want to borrow this book?\n\nYou must return it within 14 days.');">
+onsubmit="return confirm('Are you sure you want to add this book to wishlist?');">
                         <input type="hidden" name="book_id" value="<?php echo $book_id; ?>">
                         <input type="hidden" name="redirect" value="view_borrowed_books.php">
-                        <button type="submit" class="action-btn btn-borrow">Borrow</button>
+                        <button type="submit" class="action-btn btn-borrow">Add to wishlist</button>
                     </form>
                 
                 <?php else: ?>
