@@ -1,4 +1,4 @@
-<<?php
+<?php
 session_start();
 require '../config/db.php';
 
@@ -16,24 +16,33 @@ if(!$book_id){
     exit();
 }
 
-// Check if already borrowed
-$stmt = $pdo->prepare("SELECT * FROM borrowed_books WHERE book_id=? AND returned_at IS NULL");
-$stmt->execute([$book_id]);
+
+$stmt = $pdo->prepare("
+    SELECT * FROM borrowed_books 
+    WHERE book_id = ? 
+    AND user_id = ? 
+    AND returned_at IS NULL
+");
+$stmt->execute([$book_id, $user_id]);
 $result = $stmt->fetch();
 
 if($result){
-    $_SESSION['message'] = "This book is already borrowed by another user.";
+    $_SESSION['message'] = "This book is already in your wishlist.";
     header("Location: user_view_books.php");
     exit();
 }
 
-$borrowed_at = date('Y-m-d H:i:s');
-$due_date = date('Y-m-d H:i:s', strtotime('+14 days'));
 
-$stmt = $pdo->prepare("INSERT INTO borrowed_books (user_id, book_id, borrowed_at, due_date) VALUES (?, ?, ?, ?)");
-$stmt->execute([$user_id, $book_id, $borrowed_at, $due_date]);
+$added_at = date('Y-m-d H:i:s');
 
-$_SESSION['message'] = "Book borrowed successfully! Return by " . date('d M Y', strtotime($due_date));
+$stmt = $pdo->prepare("
+    INSERT INTO borrowed_books (user_id, book_id, borrowed_at, due_date) 
+    VALUES (?, ?, ?, NULL)
+");
+
+$stmt->execute([$user_id, $book_id, $added_at]);
+
+$_SESSION['message'] = "Book successfully added to wishlist!";
 header("Location: view_borrowed_books.php");
 exit();
 ?>
