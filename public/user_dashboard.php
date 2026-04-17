@@ -67,7 +67,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
 .sidebar-footer { padding: 20px 30px; }
 .logout-link { display: flex; align-items: center; color: #f43f5e; text-decoration: none; font-weight: 700; font-size: 14px; gap: 10px; }
 
-
 .main-content { flex: 1; display: flex; flex-direction: column; overflow-y: auto; padding: 0 60px; }
 
 .top-nav { display: flex; justify-content: flex-end; align-items: center; padding: 40px 0 20px 0; }
@@ -126,7 +125,8 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
 
 .badge-container {
     display: flex;
-    gap: 6px;
+    align-items: center;
+    gap: 10px;
 }
 
 .book-card h3 { 
@@ -144,7 +144,6 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
     display: block;
 }
 
-
 .category-badge { 
     padding: 4px 10px; 
     border-radius: 6px; 
@@ -155,32 +154,24 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
     color: var(--brand-dark);
 }
 
-.status-badge { 
-    padding: 4px 10px; 
-    border-radius: 6px; 
-    font-size: 9px; 
+/* Status text WITHOUT boxes */
+.status-text { 
+    font-size: 10px; 
     font-weight: 800; 
     text-transform: uppercase; 
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
 }
 
+.text-avail { color: #10b981; }
+.text-brwd { color: #f43f5e; }
 
-.bg-avail { 
-    background: transparent !important;
-    color: #10b981 !important;
+.status-text::before {
+    content: "●";
+    font-size: 8px;
 }
 
-
-.bg-avail::before {
-    content: "● ";
-    color: #10b981;
-}
-
-/
-.bg-brwd { 
-    background: #fff1f2;
-    color: #f43f5e;
-}
 .desc-toggle { 
     cursor: pointer; 
     font-size: 12px; 
@@ -245,13 +236,10 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
         <nav class="sidebar-nav">
             <ul>
                 <li><a href="user_dashboard.php" class="active"><span class="icon">🏠</span> Dashboard</a></li>
-                <li><a href="user_borrow.php"><span class="icon">📖</span> Borrow Books</a></li>
-                <li><a href="view_borrowed_books.php"><span class="icon">📑</span> View Borrowed</a></li>
-                <li><a href="view_borrowed_books.php"><span class="icon">↩️</span> Return Books</a></li>
                 <li><a href="user_view_books.php"><span class="icon">📚</span> View All Books</a></li>
-                <li><a href="#"><span class="icon">💻</span> Online Learning</a></li>
-                <li><a href="download_books.php"><span class="icon">⬇️</span> Download Books</a></li>
-            </ul>
+                <li><a href="view_borrowed_books.php"><span class="icon">📑</span> My Wishlist</a></li>
+
+         </ul>
         </nav>
 
         <div class="sidebar-footer">
@@ -283,7 +271,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
                     <div class="badge-container">
                         <span class="category-badge"><?php echo htmlspecialchars($book['category']); ?></span>
 
-                        <span class="status-badge <?php echo $is_borrowed ? 'bg-brwd' : ''; ?>">
+                        <span class="status-text <?php echo $is_borrowed ? 'text-brwd' : 'text-avail'; ?>">
                             <?php echo $is_borrowed ? 'Borrowed' : 'Available'; ?>
                         </span>
                     </div>
@@ -317,5 +305,3 @@ function toggleDescription(button) {
 </script>
 </body>
 </html>
-
-
