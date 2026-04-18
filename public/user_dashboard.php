@@ -20,9 +20,12 @@ if (!isset($_SESSION['returning_user'])) {
 $stmt = $pdo->query("SELECT * FROM books LIMIT 6");
 $books = $stmt->fetchAll();
 
-// Fetch borrowed books
-$stmt = $pdo->query("SELECT book_id FROM borrowed_books WHERE returned_at IS NULL");
-$borrowed_books = $stmt->fetchAll(PDO::FETCH_COLUMN);
+// Fetch wishlist/borrowed data to check status
+$stmt = $pdo->query("SELECT book_id, user_id FROM borrowed_books WHERE returned_at IS NULL");
+$wishlist_data = [];
+foreach ($stmt as $row) {
+    $wishlist_data[$row['book_id']] = $row['user_id'];
+}
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -238,8 +241,7 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
                 <li><a href="user_dashboard.php" class="active"><span class="icon">🏠</span> Dashboard</a></li>
                 <li><a href="user_view_books.php"><span class="icon">📚</span> View All Books</a></li>
                 <li><a href="view_borrowed_books.php"><span class="icon">📑</span> My Wishlist</a></li>
-
-         </ul>
+            </ul>
         </nav>
 
         <div class="sidebar-footer">
@@ -264,15 +266,25 @@ body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: var(--bg-
 
         <section class="book-shelf">
             <?php foreach($books as $book): 
-                $is_borrowed = in_array($book['id'], $borrowed_books);
+                $book_id = $book['id'];
+                $is_occupied = isset($wishlist_data[$book_id]);
+                $on_my_wishlist = ($is_occupied && $wishlist_data[$book_id] == $user_id);
             ?>
             <div class="book-card">
                 <div class="card-header">
                     <div class="badge-container">
                         <span class="category-badge"><?php echo htmlspecialchars($book['category']); ?></span>
 
-                        <span class="status-text <?php echo $is_borrowed ? 'text-brwd' : 'text-avail'; ?>">
-                            <?php echo $is_borrowed ? 'Borrowed' : 'Available'; ?>
+                        <span class="status-text <?php echo $is_occupied ? 'text-brwd' : 'text-avail'; ?>">
+                            <?php 
+                                if ($on_my_wishlist) {
+                                    echo 'In Wishlist';
+                                } elseif ($is_occupied) {
+                                    echo 'Unavailable';
+                                } else {
+                                    echo 'Available';
+                                }
+                            ?>
                         </span>
                     </div>
                     <span style="font-size: 16px; opacity: 0.3;">🔖</span>
