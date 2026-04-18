@@ -9,18 +9,17 @@ if(!isset($_SESSION['user_id'])) {
 
 $user_id = $_SESSION['user_id'];
 
-$stmt = $pdo->query("
+// SQL: Fetch only the current user's active wishlist items
+$stmt = $pdo->prepare("
     SELECT b.id, b.title, b.author, b.category, 
-           bb.user_id, bb.borrowed_at, bb.due_date,
-           u.name AS borrower_name
+           bb.borrowed_at AS added_date
     FROM borrowed_books bb
     JOIN books b ON bb.book_id = b.id
-    JOIN users u ON bb.user_id = u.id
-    WHERE bb.returned_at IS NULL
+    WHERE bb.user_id = ? AND bb.returned_at IS NULL
     ORDER BY bb.borrowed_at DESC
 ");
-
-$borrowed_books = $stmt->fetchAll(PDO::FETCH_ASSOC);
+$stmt->execute([$user_id]);
+$wishlist_books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 ?>
 
 <!DOCTYPE html>
@@ -28,146 +27,81 @@ $borrowed_books = $stmt->fetchAll(PDO::FETCH_ASSOC);
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Borrowed Books - Learning Hub</title>
+<title>My Wishlist | Learning Hub</title>
 <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
 
 <style>
 :root {
     --brand-teal: #3cb1c5; 
-    --brand-dark: #2e8d9e;
-    --bg-light: #fdfdfd;
+    --bg-light: #f8fafc;
     --text-main: #0f172a;
     --text-muted: #64748b;
     --white: #ffffff;
+    --danger: #ef4444;
 }
 
 * { box-sizing: border-box; margin: 0; padding: 0; }
-
 body { font-family: 'Plus Jakarta Sans', sans-serif; background: var(--bg-light); color: var(--text-main); line-height: 1.6; }
 
-header { background: var(--white); padding: 25px 60px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+header { background: var(--white); padding: 20px 60px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #e2e8f0; position: sticky; top: 0; z-index: 100; }
+header h1 { font-size: 20px; font-weight: 800; color: var(--brand-teal); }
 
-header h1 { font-size: 22px; font-weight: 800; color: var(--brand-teal); }
-
-.dash-btn { text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 14px; padding: 8px 20px; border-radius: 8px; background: #f1f5f9; transition: 0.3s; }
-
+.dash-btn { text-decoration: none; color: var(--text-main); font-weight: 700; font-size: 13px; padding: 10px 20px; border-radius: 12px; background: #f1f5f9; transition: 0.3s; }
 .dash-btn:hover { background: var(--brand-teal); color: white; }
 
-.container { max-width: 1200px; margin: 40px auto; padding: 0 40px; }
+.container { max-width: 1100px; margin: 50px auto; padding: 0 40px; }
 
-.section-header { margin-bottom: 30px; }
+.section-header { margin-bottom: 40px; }
+.section-header h2 { font-size: 32px; font-weight: 800; letter-spacing: -1px; }
+.section-header p { color: var(--text-muted); font-size: 16px; }
 
-.section-header h2 { font-size: 28px; font-weight: 800; letter-spacing: -0.5px; }
+.confirm-msg { background: #f0fdf4; color: #16a34a; padding: 15px 20px; border-radius: 12px; margin-bottom: 30px; font-weight: 700; border-left: 5px solid #16a34a; font-size: 14px; }
 
-.section-header p { color: var(--text-muted); font-size: 15px; }
+.wishlist-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 25px; }
 
-.confirm-msg { 
-    background: #ecfdf5; 
-    color: #10b981; 
-    padding: 12px 18px; 
-    border-radius: 8px; 
-    margin-bottom: 25px; 
-    font-weight: 700;
-}
-
-.books-grid { 
-    display: grid; 
-    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); 
-    gap: 25px; 
-}
-
-.book-card { 
+.wish-card { 
     background: var(--white); 
-    padding: 25px; 
-    border-radius: 16px; 
-    box-shadow: 0 4px 20px rgba(0,0,0,0.02); 
-    border: 1px solid #f1f5f9; 
-    transition: 0.3s; 
+    padding: 30px; 
+    border-radius: 20px; 
+    border: 1px solid #e2e8f0; 
+    transition: all 0.3s ease; 
     display: flex; 
     flex-direction: column; 
-    justify-content: space-between;   /* ✅ FIX ADDED */
 }
 
-.book-card:hover { 
-    transform: translateY(-5px); 
-    border-color: var(--brand-teal); 
-    box-shadow: 0 10px 25px rgba(60, 177, 197, 0.1); 
-}
+.wish-card:hover { transform: translateY(-5px); border-color: var(--brand-teal); box-shadow: 0 15px 30px rgba(0,0,0,0.04); }
 
-.category-tag { 
-    font-size: 10px; 
-    text-transform: uppercase; 
-    font-weight: 800; 
-    color: var(--brand-teal); 
-    letter-spacing: 1px; 
-    margin-bottom: 8px; 
-    display: block; 
-}
+.category-tag { font-size: 10px; text-transform: uppercase; font-weight: 800; color: var(--brand-teal); background: rgba(60, 177, 197, 0.1); padding: 4px 10px; border-radius: 6px; display: inline-block; margin-bottom: 15px; width: fit-content; }
 
-.book-card h4 { 
-    font-size: 18px; 
-    margin-bottom: 5px; 
-    color: var(--text-main); 
-}
+.wish-card h4 { font-size: 19px; font-weight: 800; margin-bottom: 5px; color: var(--text-main); line-height: 1.3; }
+.wish-card .author { font-size: 14px; color: var(--text-muted); margin-bottom: 25px; }
 
-.book-card .author { 
-    font-size: 14px; 
-    color: var(--text-muted); 
-    margin-bottom: 10px; 
-}
+.wish-footer { margin-top: auto; padding-top: 20px; border-top: 1px solid #f1f5f9; display: flex; justify-content: space-between; align-items: center; }
 
-.status-box { 
-    display: flex; 
-    flex-direction: column; 
-    padding-top: 15px; 
-    border-top: 1px solid #f1f5f9; 
-    margin-top: auto;  /* ✅ FIX ADDED */
-}
+.date-added { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
+.date-added span { display: block; color: var(--text-main); font-size: 13px; text-transform: none; }
 
-.status-text { 
-    font-size: 12px; 
-    font-weight: 700; 
-    margin-bottom: 8px; 
-    color: #f43f5e; 
-}
-
-.action-btn { 
-    border: none; 
-    padding: 10px 18px; 
+.btn-remove { 
+    background: transparent; 
+    color: var(--danger); 
+    border: 1.5px solid #fee2e2;
+    padding: 8px 16px; 
     border-radius: 10px; 
-    font-weight: 800; 
-    font-size: 13px; 
-    cursor: pointer; 
-    transition: 0.3s; 
-}
-
-.btn-return { 
-    background: #fee2e2; 
-    color: #b91c1c; 
-}
-
-.btn-return:hover { 
-    background: #fecaca; 
-    transform: scale(1.05); 
-}
-
-.back-link { 
-    margin-top: 40px; 
-    display: inline-flex; 
-    align-items: center; 
-    gap: 8px; 
     font-weight: 700; 
-    color: var(--text-muted); 
-    text-decoration: none; 
-    font-size: 14px; 
+    font-size: 12px; 
+    cursor: pointer; 
+    transition: 0.2s; 
 }
+.btn-remove:hover { background: var(--danger); color: white; border-color: var(--danger); }
 
-.back-link:hover { 
-    color: var(--brand-teal); 
-}
+.empty-state { text-align: center; padding: 80px 40px; background: white; border-radius: 24px; border: 2px dashed #e2e8f0; grid-column: 1 / -1; }
+.empty-state h3 { font-size: 20px; color: var(--text-main); margin-bottom: 10px; }
+.empty-state p { color: var(--text-muted); margin-bottom: 20px; }
+
+.back-link { margin-top: 40px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text-muted); text-decoration: none; font-size: 14px; }
+.back-link:hover { color: var(--brand-teal); }
 </style>
 </head>
-
 <body>
 
 <header>
@@ -176,57 +110,47 @@ header h1 { font-size: 22px; font-weight: 800; color: var(--brand-teal); }
 </header>
 
 <div class="container">
-
     <?php if(isset($_SESSION['message'])): ?>
-        <div class="confirm-msg">
-            <?php echo $_SESSION['message']; unset($_SESSION['message']); ?>
-        </div>
+        <div class="confirm-msg"><?php echo $_SESSION['message']; unset($_SESSION['message']); ?></div>
     <?php endif; ?>
 
     <div class="section-header">
-        <h2>All Borrowed Books</h2>
-        <p>See all borrowed books and track their due dates.</p>
+        <h2>My Wishlist</h2>
+        <p>Manage the books you've saved to read later.</p>
     </div>
 
-    <div class="books-grid">
-
-        <?php if(count($borrowed_books) > 0): ?>
-            <?php foreach($borrowed_books as $book): ?>
-
-            <div class="book-card">
-                <span class="category-tag">
-                    <?php echo htmlspecialchars($book['category']); ?>
-                </span>
-
+    <div class="wishlist-grid">
+        <?php if(count($wishlist_books) > 0): ?>
+            <?php foreach($wishlist_books as $book): ?>
+            <div class="wish-card">
+                <span class="category-tag"><?php echo htmlspecialchars($book['category']); ?></span>
                 <h4><?php echo htmlspecialchars($book['title']); ?></h4>
                 <p class="author">by <?php echo htmlspecialchars($book['author']); ?></p>
 
-                <div class="status-box">
-                    <span class="status-text">
-                        ● Borrowed by: <?php echo htmlspecialchars($book['borrower_name']); ?><br>
-                        ● Borrowed on: <?php echo date('d M Y', strtotime($book['borrowed_at'])); ?><br>
-                        ● Due date: <?php echo date('d M Y', strtotime($book['due_date'])); ?>
-                    </span>
+                <div class="wish-footer">
+                    <div class="date-added">
+                        Added on
+                        <span><?php echo date('d M Y', strtotime($book['added_date'])); ?></span>
+                    </div>
 
-                    <?php if($book['user_id'] == $user_id): ?>
-                        <form action="user_return.php" method="POST"
-                              onsubmit="return confirm('Are you sure you want to return this book?');">
-                            <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
-                            <button type="submit" class="action-btn btn-return">Return</button>
-                        </form>
-                    <?php endif; ?>
+                    <form action="user_return.php" method="POST" 
+                          onsubmit="return confirm('Remove this book from your wishlist?');">
+                        <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
+                        <button type="submit" class="btn-remove">Remove</button>
+                    </form>
                 </div>
             </div>
-
             <?php endforeach; ?>
         <?php else: ?>
-            <p>No books are currently borrowed.</p>
+            <div class="empty-state">
+                <h3>Your wishlist is empty</h3>
+                <p>Browse the catalog and add books you're interested in.</p>
+                <a href="user_view_books.php" class="dash-btn" style="background: var(--brand-teal); color: white;">Explore Catalog</a>
+            </div>
         <?php endif; ?>
-
     </div>
 
     <a href="user_dashboard.php" class="back-link">← Back to Dashboard</a>
 </div>
-
 </body>
 </html>
