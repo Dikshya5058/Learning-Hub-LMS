@@ -1,3 +1,4 @@
+user_login.php
 <?php
 session_start();
 require '../config/db.php';
@@ -17,7 +18,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
-            header("Location: user_dashboard.php");
+            header("Location: check_subscription.php");
             exit();
         } else {
             $login_error = "Invalid email or password.";
