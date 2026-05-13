@@ -1,3 +1,4 @@
+
 <?php
 session_start();
 require '../config/db.php';
@@ -11,6 +12,7 @@ $plan_id = $_GET['plan_id'] ?? null;
 
 if (!$plan_id) die("Invalid plan");
 
+// Store selected plan
 $_SESSION['selected_plan_id'] = $plan_id;
 
 $stmt = $pdo->prepare("SELECT * FROM subscription_plans WHERE id = ?");
@@ -24,10 +26,12 @@ $total_amount = $amount;
 
 $transaction_uuid = uniqid("TXN_");
 
+// Store transaction UUID
+$_SESSION['transaction_uuid'] = $transaction_uuid;
+
 $product_code = "EPAYTEST";
 $secret_key = "8gBm/:&EnhH.1/q";
 
-// IMPORTANT: must be reachable URL (NOT wrong folder)
 $success_url = "http://localhost/Learning-Hub-LMS/public/payment_success.php";
 $failure_url = "http://localhost/Learning-Hub-LMS/public/payment_failed.php";
 
