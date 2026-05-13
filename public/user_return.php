@@ -11,7 +11,7 @@ $user_id = $_SESSION['user_id'];
 $book_id = $_POST['book_id'] ?? null;
 
 if(!$book_id){
-    $_SESSION['message'] = "⚠️ No book selected to remove.";
+    $_SESSION['message'] = "No book selected to remove.";
     header("Location: view_borrowed_books.php");
     exit();
 }
@@ -22,7 +22,7 @@ $stmt->execute([$user_id, $book_id]);
 $result = $stmt->fetch();
 
 if(!$result){
-    $_SESSION['message'] = "⚠️ This book was not found in your wishlist.";
+    $_SESSION['message'] = "This book was not found in your wishlist.";
     header("Location: view_borrowed_books.php");
     exit();
 }
@@ -33,9 +33,9 @@ $removed_at = date('Y-m-d H:i:s');
 $stmt = $pdo->prepare("UPDATE borrowed_books SET returned_at=? WHERE user_id=? AND book_id=? AND returned_at IS NULL");
 
 if($stmt->execute([$removed_at, $user_id, $book_id])) {
-    $_SESSION['message'] = "✅ Book removed from wishlist.";
+    $_SESSION['message'] = "Book removed from wishlist.";
 } else {
-    $_SESSION['message'] = "❌ Failed to remove book.";
+    $_SESSION['message'] = "Failed to remove book.";
 }
 
 header("Location: view_borrowed_books.php");
