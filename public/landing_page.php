@@ -1,4 +1,3 @@
-landing_page.php
 <!DOCTYPE html>
 <html lang="en">
 <head>
