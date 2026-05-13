@@ -48,7 +48,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 </head>
 <body>
 
-<!-- Navbar -->
+
 <nav>
     <div class="nav-links">
         <a href="user_login.php" class="nav-login">Log In</a>
@@ -56,7 +56,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
     </div>
 </nav>
 
-<!-- Main container -->
+
 <main class="signup-container">
     <div class="hero-text">
         <h1>Sign up for <span>LMS</span></h1>
@@ -68,27 +68,27 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
 
         <form action="user_registration.php" method="POST">
 
-            <!-- Name -->
+         
             <div class="input-group">
                 <label>Name</label>
                 <input type="text" name="name" placeholder="Full Name" required value="<?php echo isset($name) ? htmlspecialchars($name) : ''; ?>">
             </div>
             
-            <!-- Email -->
+            
             <div class="input-group">
                 <label>Email</label>
                 <input type="email" name="email" placeholder="E-mail" required value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>">
                 <div class="field-error"><?php echo $email_error; ?></div>
             </div>
 
-            <!-- Password -->
+            
             <div class="input-group">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="Enter password" required>
                 <div class="field-error"><?php echo $password_error; ?></div>
             </div>
 
-            <!-- Confirm Password -->
+            
             <div class="input-group">
                 <label>Confirm Password</label>
                 <input type="password" name="confirm_password" placeholder="Confirm Password" required>
