@@ -1,4 +1,3 @@
-user_login.php
 <?php
 session_start();
 require '../config/db.php';
@@ -18,7 +17,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
         if (password_verify($password, $user['password'])) {
             $_SESSION['user_id'] = $user['id'];
             $_SESSION['user_name'] = $user['name'];
-            header("Location: check_subscription.php");
+            header("Location: user_dashboard.php");
             exit();
         } else {
             $login_error = "Invalid email or password.";
@@ -65,11 +64,11 @@ if ($_SERVER["REQUEST_METHOD"] == "POST") {
                        value="<?php echo isset($email) ? htmlspecialchars($email) : ''; ?>">
             </div>
 
-            <!-- Password -->
+           
             <div class="input-group">
                 <label>Password</label>
                 <input type="password" name="password" placeholder="Password" required>
-                <!-- Login error appears here -->
+                
                 <div class="field-error"><?php echo $login_error; ?></div>
             </div>
 
