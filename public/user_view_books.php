@@ -35,7 +35,7 @@ $my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
             --text-muted: #64748b;
             --white: #ffffff;
             --accent-soft: rgba(60, 177, 197, 0.08);
-            /* NEW: Wishlist Red Theme */
+            
             --wishlist-red: #ef4444;
             --wishlist-red-bg: #fef2f2;
         }
