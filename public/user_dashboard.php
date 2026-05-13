@@ -1,11 +1,6 @@
-<?php
-session_start();
-require '../config/db.php';
 
-if (!isset($_SESSION['user_id'])) {
-    header("Location: user_login.php");
-    exit();
-}
+<?php
+require_once __DIR__ . '/auth_guard.php';
 
 $user_id = $_SESSION['user_id'];
 $user_name = $_SESSION['user_name'];
@@ -21,7 +16,7 @@ $books = $stmt->fetchAll();
 
 $stmt = $pdo->prepare("SELECT book_id FROM borrowed_books WHERE user_id = ? AND returned_at IS NULL");
 $stmt->execute([$user_id]);
-$my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0); 
+$my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -204,9 +199,9 @@ $my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 
         <nav class="sidebar-nav">
             <ul>
-                <li><a href="user_dashboard.php" class="active"><span class="icon">🏠</span> Dashboard</a></li>
-                <li><a href="user_view_books.php"><span class="icon">📚</span> View All Books</a></li>
-                <li><a href="view_borrowed_books.php"><span class="icon">📑</span> My Wishlist</a></li>
+                <li><a href="user_dashboard.php" class="active">Dashboard</a></li>
+                <li><a href="user_view_books.php">View All Books</a></li>
+                <li><a href="view_borrowed_books.php">My Wishlist</a></li>
             </ul>
         </nav>
 
@@ -216,7 +211,10 @@ $my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
         </div>
 
         <div class="sidebar-footer">
-            <a href="user_logout.php" class="logout-link"><span>🚪</span> Log Out</a>
+            <a href="user_logout.php" class="logout-link"
+   onclick="return confirm('Are you sure you want to logout?')">
+    Log Out
+</a>
         </div>
     </aside>
 
