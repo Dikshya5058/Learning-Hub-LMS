@@ -35,7 +35,7 @@ if (!$book || empty($book['pdf_file'])) {
 /* ================================
    FIXED PDF PATH (IMPORTANT FIX)
 ================================ */
-$pdfUrl = "/Learning-Hub-LMS/" . $book['pdf_file'];
+$pdfUrl = "/Learning-Hub-LMS/public/" . $book['pdf_file'];
 ?>
 
 <!DOCTYPE html>
