@@ -228,11 +228,19 @@ $my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
     <?php endif; ?>
 
     <div class="section-header">
-        <h2>All Library Books</h2>
-        <p>Explore our collection and save your favorites to your personal wishlist.</p>
-    </div>
+    <h2>All Library Books</h2>
+    <p>Explore our collection and save your favorites to your personal wishlist.</p>
+</div>
 
-    <div class="books-grid">
+<!-- SEARCH BOX (separate, clean) -->
+<input 
+    type="text" 
+    id="searchBox" 
+    placeholder="Search books by title..." 
+    style="width:100%; max-width:400px; padding:12px; border-radius:10px; border:1px solid #e2e8f0; margin-bottom:20px;"
+>
+
+<div class="books-grid" id="booksContainer">
         <?php foreach($books as $book): 
             $book_id = $book['id'];
             $is_on_my_wishlist = in_array($book_id, $my_wishlist);
@@ -269,11 +277,22 @@ $my_wishlist = $stmt->fetchAll(PDO::FETCH_COLUMN, 0);
 </div>
 
 <script>
-function toggleDescription(button) {
-    const desc = button.nextElementSibling;
-    desc.classList.toggle('show-desc');
-    button.textContent = desc.classList.contains('show-desc') ? 'Hide Details' : 'Quick Details';
-}
+const searchBox = document.getElementById("searchBox");
+const container = document.getElementById("booksContainer");
+
+let timer = null;
+
+searchBox.addEventListener("input", function () {
+    clearTimeout(timer);
+
+    timer = setTimeout(() => {
+        fetch("search_books.php?search=" + encodeURIComponent(this.value))
+            .then(res => res.text())
+            .then(data => {
+                container.innerHTML = data;
+            });
+    }, 300);
+});
 </script>
 
 </body>
