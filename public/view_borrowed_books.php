@@ -81,18 +81,7 @@ header h1 { font-size: 20px; font-weight: 800; color: var(--brand-teal); }
 .date-added { font-size: 11px; color: var(--text-muted); font-weight: 600; text-transform: uppercase; }
 .date-added span { display: block; color: var(--text-main); font-size: 13px; text-transform: none; }
 
-.btn-remove { 
-    background: transparent; 
-    color: var(--danger); 
-    border: 1.5px solid #fee2e2;
-    padding: 8px 16px; 
-    border-radius: 10px; 
-    font-weight: 700; 
-    font-size: 12px; 
-    cursor: pointer; 
-    transition: 0.2s; 
-}
-.btn-remove:hover { background: var(--danger); color: white; border-color: var(--danger); }
+
 
 .empty-state { text-align: center; padding: 80px 40px; background: white; border-radius: 24px; border: 2px dashed #e2e8f0; grid-column: 1 / -1; }
 .empty-state h3 { font-size: 20px; color: var(--text-main); margin-bottom: 10px; }
@@ -100,6 +89,40 @@ header h1 { font-size: 20px; font-weight: 800; color: var(--brand-teal); }
 
 .back-link { margin-top: 40px; display: inline-flex; align-items: center; gap: 8px; font-weight: 700; color: var(--text-muted); text-decoration: none; font-size: 14px; }
 .back-link:hover { color: var(--brand-teal); }
+
+
+.wish-footer {
+    margin-top: auto;
+    padding-top: 20px;
+    border-top: 1px solid #f1f5f9;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    justify-content: flex-start;
+}
+.btn-read {
+    text-decoration: none;
+    background: #3cb1c5;
+    color: white;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 12px;
+    display: inline-block;
+    white-space: nowrap;
+}
+
+.btn-remove {
+    background: transparent;
+    color: #ef4444;
+    border: 1.5px solid #fee2e2;
+    padding: 8px 14px;
+    border-radius: 10px;
+    font-weight: 700;
+    font-size: 12px;
+    cursor: pointer;
+    white-space: nowrap;
+}
 </style>
 </head>
 <body>
@@ -128,18 +151,20 @@ header h1 { font-size: 20px; font-weight: 800; color: var(--brand-teal); }
                 <p class="author">by <?php echo htmlspecialchars($book['author']); ?></p>
 
                 <div class="wish-footer">
-                    <div class="date-added">
-                        Added on
-                        <span><?php echo date('d M Y', strtotime($book['added_date'])); ?></span>
-                    </div>
 
-                    <form action="user_return.php" method="POST" 
-                          onsubmit="return confirm('Remove this book from your wishlist?');">
-                        <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
-                        <button type="submit" class="btn-remove">Remove</button>
-                    </form>
-                </div>
-            </div>
+    <a href="read_book_online.php?id=<?php echo $book['id']; ?>" 
+       class="btn-read">
+       📖 Read
+    </a>
+
+    <form action="user_return.php" method="POST"
+          onsubmit="return confirm('Remove this book from your wishlist?');">
+        <input type="hidden" name="book_id" value="<?php echo $book['id']; ?>">
+        <button type="submit" class="btn-remove">Remove</button>
+    </form>
+    </div>
+
+</div>
             <?php endforeach; ?>
         <?php else: ?>
             <div class="empty-state">
