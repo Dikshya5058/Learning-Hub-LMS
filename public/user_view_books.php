@@ -293,7 +293,15 @@ searchBox.addEventListener("input", function () {
             });
     }, 300);
 });
-</script>
 
+function toggleDescription(button) {
+    const desc = button.nextElementSibling;
+    desc.classList.toggle('show-desc');
+
+    button.textContent = desc.classList.contains('show-desc')
+        ? 'Hide Details'
+        : 'Quick Details';
+}
+</script>
 </body>
 </html>
