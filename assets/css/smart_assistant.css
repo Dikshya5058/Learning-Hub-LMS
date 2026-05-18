@@ -1,0 +1,72 @@
+/* Glassmorphism Panel */
+.ai-panel {
+    position: fixed;
+    top: 20px;
+    right: -420px;
+    width: 380px;
+    height: calc(100vh - 40px);
+    background: rgba(10, 10, 10, 0.92);
+    backdrop-filter: blur(25px);
+    -webkit-backdrop-filter: blur(25px);
+    box-shadow: -15px 0 35px rgba(0,0,0,0.7);
+    transition: all 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    z-index: 9999;
+    color: white;
+    border-radius: 24px 0 0 24px;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    flex-direction: column;
+}
+
+.ai-panel.open { right: 0; }
+
+.ai-header { 
+    padding: 25px; 
+    background: linear-gradient(135deg, #3cb1c5 0%, #1e616d 100%);
+    border-radius: 24px 0 0 0;
+    display: flex; justify-content: space-between; align-items: center; 
+}
+
+.ai-tabs { display: flex; background: rgba(0,0,0,0.4); padding: 5px; }
+.tab-btn { 
+    flex: 1; padding: 12px 5px; border: none; background: transparent; 
+    color: #666; cursor: pointer; font-size: 10px; font-weight: 800; text-transform: uppercase;
+}
+.tab-btn.active { color: #3cb1c5; border-bottom: 2px solid #3cb1c5; }
+
+.ai-content { padding: 25px; overflow-y: auto; flex: 1; }
+
+/* Content Styling */
+.tab-pane { display: none; }
+.tab-pane.active { display: block; animation: fadeIn 0.4s; }
+
+#sum-text { font-size: 15px; line-height: 1.8; color: #ddd; }
+
+.point-list li { margin-bottom: 18px; color: #bbb; list-style: none; padding-left: 25px; position: relative; font-size: 14px; }
+.point-list li::before { content: "✦"; position: absolute; left: 0; color: #3cb1c5; font-size: 18px; }
+
+.rec-card {
+    background: rgba(255, 255, 255, 0.07);
+    padding: 18px;
+    border-radius: 15px;
+    margin-bottom: 15px;
+    border: 1px solid rgba(255,255,255,0.1);
+    font-size: 14px;
+    font-weight: 600;
+}
+
+.faq-q { color: #3cb1c5; font-weight: 800; font-size: 15px; margin-bottom: 8px; }
+.faq-a { color: #999; font-size: 13px; line-height: 1.6; background: rgba(0,0,0,0.2); padding: 10px; border-radius: 8px; }
+
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+/* Pulse Button */
+@keyframes pulse-glow {
+    0% { box-shadow: 0 0 0 0 rgba(60, 177, 197, 0.7); }
+    70% { box-shadow: 0 0 0 12px rgba(60, 177, 197, 0); }
+    100% { box-shadow: 0 0 0 0 rgba(60, 177, 197, 0); }
+}
+.ai-btn-trigger { 
+    background: #3cb1c5; color: white; border: none; padding: 10px 20px; 
+    border-radius: 50px; font-weight: 800; cursor: pointer; animation: pulse-glow 2s infinite;
+}
